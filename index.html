@@ -1,61 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Viral Link Generator</title>
+  <title>Viral Link Generator Pro</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family:Arial;
+      background:linear-gradient(135deg,#0f172a,#1e293b);
+      color:white;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    }
+
+    .box{
+      width:90%;
+      max-width:500px;
+      background:rgba(255,255,255,0.05);
+      padding:20px;
+      border-radius:15px;
+      box-shadow:0 0 20px rgba(0,0,0,0.5);
+      backdrop-filter:blur(10px);
+    }
+
+    input{
+      width:100%;
+      padding:12px;
+      margin-top:10px;
+      border:none;
+      border-radius:8px;
+      outline:none;
+    }
+
+    button{
+      width:100%;
+      padding:12px;
+      margin-top:10px;
+      border:none;
+      border-radius:8px;
+      background:#3b82f6;
+      color:white;
+      cursor:pointer;
+      font-size:16px;
+    }
+
+    button:hover{
+      background:#2563eb;
+    }
+
+    .result{
+      margin-top:15px;
+      word-break:break-all;
+    }
+
+    .copy{
+      background:#22c55e;
+      margin-top:10px;
+    }
+  </style>
 </head>
 
-<body style="margin:0;font-family:Arial;background:#0f172a;color:white;">
+<body>
 
-<h2 style="text-align:center;padding:10px;">🔗 Viral Link Generator</h2>
+<div class="box">
 
-<div style="padding:20px;text-align:center;">
+  <h2>🔗 Viral Link Generator Pro</h2>
 
-  <input id="longUrl" placeholder="Paste your long URL"
-    style="width:80%;padding:10px;margin:10px;" />
+  <input id="url" placeholder="Paste your long URL" />
 
-  <button onclick="generate()"
-    style="padding:10px 20px;">Generate Link</button>
+  <button onclick="gen()">Generate Link</button>
 
-  <div id="result" style="margin-top:20px;"></div>
+  <div class="result" id="out"></div>
 
 </div>
 
 <script>
 
-function generate() {
-  let url = document.getElementById("longUrl").value;
+let lastLink = "";
 
-  if (!url) {
-    alert("Please enter URL");
+function gen(){
+  let url = document.getElementById("url").value;
+
+  if(!url){
+    alert("Enter URL");
     return;
   }
 
-  // simple fake short link system (no backend needed)
-  let shortId = Math.random().toString(36).substring(2, 8);
+  let id = Math.random().toString(36).substring(2,8);
 
-  let shortLink = window.location.href + "#" + shortId;
+  localStorage.setItem(id,url);
 
-  // store mapping in browser
-  localStorage.setItem(shortId, url);
+  let short = window.location.href.split("#")[0] + "#" + id;
 
-  document.getElementById("result").innerHTML =
-    "🔗 Short Link: <br><br><a href='" + shortLink + "' target='_blank'>" + shortLink + "</a>";
+  lastLink = short;
+
+  document.getElementById("out").innerHTML = `
+    <p>🔗 Short Link:</p>
+    <a href="${short}" target="_blank">${short}</a>
+    <button class="copy" onclick="copy()">Copy Link</button>
+  `;
+}
+
+function copy(){
+  navigator.clipboard.writeText(lastLink);
+  alert("Copied!");
 }
 
 // redirect system
-window.onload = function () {
-  let hash = window.location.hash.replace("#", "");
+window.onload = function(){
+  let id = window.location.hash.replace("#","");
 
-  if (hash) {
-    let original = localStorage.getItem(hash);
-
-    if (original) {
-      window.location.href = original;
+  if(id){
+    let url = localStorage.getItem(id);
+    if(url){
+      window.location.href = url;
     } else {
-      document.body.innerHTML = "❌ Link not found";
+      document.body.innerHTML = "<h2>Link not found ❌</h2>";
     }
   }
-};
+}
 
 </script>
 
