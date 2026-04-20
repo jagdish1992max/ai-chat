@@ -1,63 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Simple AI Chat</title>
+  <title>Viral Link Generator</title>
 </head>
 
 <body style="margin:0;font-family:Arial;background:#0f172a;color:white;">
 
-<h2 style="text-align:center;padding:10px;">🤖 Simple AI Chat</h2>
+<h2 style="text-align:center;padding:10px;">🔗 Viral Link Generator</h2>
 
-<div id="chat" style="height:75vh;overflow:auto;padding:10px;"></div>
+<div style="padding:20px;text-align:center;">
 
-<div style="display:flex;padding:10px;background:#111827;">
-  <input id="input" style="flex:1;padding:10px;" placeholder="Ask anything..." />
-  <button onclick="send()" style="padding:10px;">Send</button>
+  <input id="longUrl" placeholder="Paste your long URL"
+    style="width:80%;padding:10px;margin:10px;" />
+
+  <button onclick="generate()"
+    style="padding:10px 20px;">Generate Link</button>
+
+  <div id="result" style="margin-top:20px;"></div>
+
 </div>
 
 <script>
 
-const API_KEY = "AIzaSyAXbgxsy5yHnZinjn4RsGxd6tWJsg8jdw8";
+function generate() {
+  let url = document.getElementById("longUrl").value;
 
-async function send() {
-  let input = document.getElementById("input");
-  let text = input.value;
-  if (!text) return;
+  if (!url) {
+    alert("Please enter URL");
+    return;
+  }
 
-  add("👤 " + text);
+  // simple fake short link system (no backend needed)
+  let shortId = Math.random().toString(36).substring(2, 8);
 
-  input.value = "";
+  let shortLink = window.location.href + "#" + shortId;
 
-  const res = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [
-          { parts: [{ text: text }] }
-        ]
-      })
+  // store mapping in browser
+  localStorage.setItem(shortId, url);
+
+  document.getElementById("result").innerHTML =
+    "🔗 Short Link: <br><br><a href='" + shortLink + "' target='_blank'>" + shortLink + "</a>";
+}
+
+// redirect system
+window.onload = function () {
+  let hash = window.location.hash.replace("#", "");
+
+  if (hash) {
+    let original = localStorage.getItem(hash);
+
+    if (original) {
+      window.location.href = original;
+    } else {
+      document.body.innerHTML = "❌ Link not found";
     }
-  );
-
-  const data = await res.json();
-
-  const reply =
-    data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-    "No response ❌";
-
-  add("🤖 " + reply);
-}
-
-function add(text) {
-  let div = document.createElement("div");
-  div.style.margin = "10px";
-  div.innerText = text;
-  document.getElementById("chat").appendChild(div);
-}
+  }
+};
 
 </script>
 
 </body>
-  </html>
+</html>
